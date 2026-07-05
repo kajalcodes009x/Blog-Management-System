@@ -1,0 +1,31 @@
+body{
+    background:#f4f7fc;
+    font-family:Arial, sans-serif;
+}
+
+.navbar{
+    box-shadow:0 4px 10px rgba(0,0,0,.1);
+}
+
+.card{
+    border:none;
+    border-radius:20px;
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.btn{
+    border-radius:10px;
+}
+
+.form-control{
+    border-radius:10px;
+}
+
+h2,h3,h4{
+    font-weight:bold;
+}
