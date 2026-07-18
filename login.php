@@ -4,29 +4,41 @@ include("db.php");
 
 if(isset($_POST['login']))
 {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
 
-    $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
-    $result = mysqli_query($conn,$sql);
-
-    if(mysqli_num_rows($result)>0)
+    if(empty($username) || empty($password))
     {
-        $_SESSION['username']=$username;
-        header("Location: dashboard.php");
-        exit();
+        $error = "Please fill all fields!";
     }
     else
     {
-        $error="Invalid Username or Password!";
+        $stmt = mysqli_prepare($conn, "SELECT * FROM users WHERE username=? AND password=?");
+        mysqli_stmt_bind_param($stmt, "ss", $username, $password);
+        mysqli_stmt_execute($stmt);
+
+        $result = mysqli_stmt_get_result($stmt);
+
+        if(mysqli_num_rows($result) > 0)
+        {
+            $_SESSION['username'] = $username;
+            header("Location: dashboard.php");
+            exit();
+        }
+        else
+        {
+            $error = "Invalid Username or Password!";
+        }
+
+        mysqli_stmt_close($stmt);
     }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<link rel="stylesheet" href="assets/css/style.css">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,6 +47,7 @@ if(isset($_POST['login']))
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
+<link rel="stylesheet" href="style.css">
 
 </head>
 
@@ -59,53 +72,39 @@ Login to continue
 <?php
 if(isset($error))
 {
-echo "<div class='alert alert-danger'>$error</div>";
+    echo "<div class='alert alert-danger'>$error</div>";
 }
 ?>
 
 <form method="POST">
 
 <div class="mb-3">
-
-<label class="form-label">
-Username
-</label>
-
+<label class="form-label">Username</label>
 <input
 type="text"
 name="username"
 class="form-control"
 placeholder="Enter Username"
 required>
-
 </div>
 
 <div class="mb-3">
-
-<label class="form-label">
-Password
-</label>
-
+<label class="form-label">Password</label>
 <input
 type="password"
 name="password"
 class="form-control"
 placeholder="Enter Password"
 required>
-
 </div>
 
 <div class="d-grid">
-
 <button
 type="submit"
 name="login"
 class="btn btn-primary">
-
 Login
-
 </button>
-
 </div>
 
 </form>
@@ -123,9 +122,11 @@ ApexPlanet Internship Project
 </div>
 
 </div>
+
 <footer class="text-center mt-5 mb-3 text-muted">
-    <hr>
-    <p>© 2026 Blog Management System | Developed by Kajal Kumari</p>
+<hr>
+<p>© 2026 Blog Management System | Developed by Kajal Kumari</p>
 </footer>
+
 </body>
 </html>
